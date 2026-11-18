@@ -9,6 +9,7 @@
     <title>منظومة الانضباط ومتابعة الدوام المدرسي | ابتدائية ومتوسطة عيبان</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -71,8 +72,6 @@
                 size: A4 landscape;
                 margin: 8mm;
             }
-
-            /* Isolated Print Mode: Accountability Notice (نموذج المساءلة - A4 Portrait Official Sheet) */
             body.print-notice-only header,
             body.print-notice-only main,
             body.print-notice-only .print-only,
@@ -130,8 +129,6 @@
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
             }
-
-            /* Isolated Print Mode: Individual Teacher Report (التقرير الفردي للمعلم) */
             body.print-individual-only header,
             body.print-individual-only .print-only,
             body.print-individual-only #kpiSummarySection,
@@ -169,7 +166,7 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- SECURITY GATE: Authorized Access Overlay (Principal, Vice Principal, System Designer) -->
+    <!-- SECURITY GATE: Authorized Access Overlay -->
     <div id="authGateOverlay" class="fixed inset-0 z-50 moe-gradient flex items-center justify-center p-4 no-print overflow-y-auto">
         <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#69cee3 2px, transparent 2px); background-size: 24px 24px;"></div>
 
@@ -216,12 +213,11 @@
         </div>
     </div>
 
-    <!-- Top Official Header aligned with attached MOE Visual Identity & Exact Uploaded Logo -->
+    <!-- Top Official Header -->
     <header class="moe-gradient text-white shadow-lg border-b-4 moe-border-gold relative overflow-hidden">
         <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#69cee3 2px, transparent 2px); background-size: 22px 22px;"></div>
         
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 relative z-10">
-            <!-- Top Security & Live Sync Status Strip -->
             <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-white/15 text-xs no-print">
                 <div class="flex flex-wrap items-center gap-2">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/25 border border-white/20 text-white font-bold">
@@ -238,7 +234,7 @@
                 <div class="flex flex-wrap items-center gap-2">
                     <button id="btnOpenShareCloudModal" type="button" class="hidden px-3 py-1 rounded-xl bg-[#07a869] hover:bg-[#0da9a6] text-white font-extrabold transition flex items-center gap-1.5 shadow-sm border border-white/30">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-                        <span>مشاركة المنظومة والمزامنة الفورية</span>
+                        <span>مشاركة المنظومة والمزامنة الفورية (Supabase)</span>
                     </button>
                     <button id="btnLockSystem" type="button" class="px-3 py-1 rounded-xl bg-red-600/80 hover:bg-red-600 text-white font-bold transition flex items-center gap-1 border border-white/20" title="قفل المنظومة وتبديل المستخدم">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
@@ -248,7 +244,6 @@
             </div>
 
             <div class="flex flex-col xl:flex-row items-center justify-between gap-4">
-                <!-- Right: Exact Uploaded MOE Logo Image & School Hierarchy -->
                 <div class="flex items-center gap-4 text-center sm:text-right">
                     <div class="bg-white px-3 py-2 rounded-2xl shadow-md border-2 border-[#c1b489] flex items-center justify-center shrink-0">
                         <img id="headerLogoImg" src="" alt="شعار وزارة التعليم" class="h-14 w-auto object-contain max-w-full">
@@ -260,7 +255,6 @@
                     </div>
                 </div>
 
-                <!-- Center: Interactive Season Toggle & Official Timing Display -->
                 <div class="bg-[#15445a]/75 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-[#69cee3]/30 flex flex-col sm:flex-row items-center gap-3 shadow-inner">
                     <button id="btnToggleSeason" type="button" class="px-3.5 py-2 rounded-xl font-extrabold text-xs transition flex items-center gap-2 shadow-sm border border-[#c1b489]/60 bg-[#0da9a6] hover:bg-[#07a869] text-white cursor-pointer no-print" title="انقر للتبديل المباشر بين الدوام الشتوي والصيفي">
                         <span id="seasonIcon" class="text-base">❄️</span>
@@ -277,7 +271,6 @@
                     </div>
                 </div>
 
-                <!-- Left: Multi-Day Date Navigator & Print Action -->
                 <div class="flex flex-wrap items-center justify-center gap-2 no-print">
                     <div class="bg-[#15445a]/80 px-2.5 py-1.5 rounded-xl border border-white/20 flex items-center gap-1.5">
                         <button id="btnPrevDay" type="button" class="p-1.5 rounded-lg hover:bg-white/10 text-[#69cee3] transition" title="اليوم السابق">
@@ -308,7 +301,7 @@
         </div>
     </header>
 
-    <!-- Print-Only Official Banner with Uploaded Logo -->
+    <!-- Print-Only Official Banner -->
     <div class="print-only px-6 pt-2 pb-3 border-b-2 border-[#15445a] mb-3">
         <div class="flex items-center justify-between text-xs font-bold text-[#15445a]">
             <div class="flex items-center gap-3">
@@ -327,7 +320,6 @@
 
         <!-- Strategic HR KPI Summary Cards -->
         <section id="kpiSummarySection" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-            <!-- Total Staff -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border-r-4 border-[#15445a] print-card">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-gray-500">إجمالي المنسوبين</span>
@@ -342,7 +334,6 @@
                 <p id="kpiDisciplineRate" class="text-[11px] text-[#0da9a6] font-bold mt-1">مؤشر الانضباط: 100%</p>
             </div>
 
-            <!-- Present On Time -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border-r-4 border-[#07a869] print-card">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-gray-500">حاضر منتظم</span>
@@ -357,7 +348,6 @@
                 <p class="text-[11px] text-gray-400 mt-1">التزام كامل بالدوام</p>
             </div>
 
-            <!-- Morning Assembly Attendance -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border-r-4 border-[#0da9a6] print-card">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-gray-500">حضور الاصطفاف الصباحي</span>
@@ -372,7 +362,6 @@
                 <p id="kpiAssemblySub" class="text-[11px] text-[#0da9a6] font-bold mt-1">متابعة الاصطفاف الصباحي</p>
             </div>
 
-            <!-- Late Arrival -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border-r-4 border-[#c1b489] print-card">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-gray-500">متأخر صباحًا</span>
@@ -387,7 +376,6 @@
                 <p id="kpiLateMinutes" class="text-[11px] text-[#8a7d55] font-bold mt-1">إجمالي: 0 دقيقة</p>
             </div>
 
-            <!-- Authorized Permission -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border-r-4 border-[#3d7eb9] print-card">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-gray-500">استئذان رسمي</span>
@@ -402,7 +390,6 @@
                 <p class="text-[11px] text-gray-400 mt-1">خروج بموافقة الإدارة</p>
             </div>
 
-            <!-- Early Departure Without Permission -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border-r-4 border-[#7258a4] print-card">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-gray-500">خروج مبكر دون إذن</span>
@@ -417,7 +404,6 @@
                 <p id="kpiEarlyMinutes" class="text-[11px] text-[#7258a4] font-bold mt-1">إجمالي: 0 دقيقة</p>
             </div>
 
-            <!-- Absent -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border-r-4 border-red-600 print-card">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-gray-500">غائب</span>
@@ -436,7 +422,6 @@
         <!-- Navigation Tabs, Saved Days History & Filters Bar (No Print) -->
         <section class="bg-white rounded-2xl p-4 shadow-sm border border-[#69cee3]/40 space-y-4 no-print">
             <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
-                <!-- View Tabs -->
                 <div class="flex flex-wrap items-center gap-2">
                     <button id="tabBtnRegistry" type="button" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition moe-title-bar text-white shadow-sm flex items-center gap-1.5">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
@@ -461,7 +446,6 @@
                     </button>
                 </div>
 
-                <!-- Filters & Actions -->
                 <div class="flex flex-wrap items-center gap-2">
                     <div class="relative flex-1 sm:w-52">
                         <input type="text" id="searchInput" placeholder="بحث بالاسم أو السجل المدني..." class="w-full pl-3 pr-9 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#0da9a6]">
@@ -498,7 +482,6 @@
                 </div>
             </div>
 
-            <!-- Quick Previous Days Bar -->
             <div class="pt-3 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div class="flex flex-wrap items-center gap-2">
                     <span class="font-extrabold text-[#15445a] flex items-center gap-1">
@@ -911,13 +894,13 @@
         </div>
     </div>
 
-    <!-- MODAL 3: Share System, Live Auto-Save & Cloud Sync Hub -->
+    <!-- MODAL 3: Share System, Live Auto-Save & Supabase Cloud Sync Hub -->
     <div id="modalShareCloud" class="fixed inset-0 bg-[#15445a]/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
         <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border-t-4 border-[#07a869] overflow-hidden max-h-[90vh] flex flex-col">
             <div class="px-6 py-4 bg-[#15445a] text-white flex items-center justify-between shrink-0">
                 <div>
                     <h3 class="font-extrabold text-base flex items-center gap-2">
-                        <span>مشاركة المنظومة والحفظ المباشر للبيانات</span>
+                        <span>مشاركة المنظومة والربط السحابي (Supabase)</span>
                         <span class="text-[11px] bg-[#07a869] px-2 py-0.5 rounded-full">نشط ✓</span>
                     </h3>
                     <p class="text-xs text-[#69cee3]">مشاركة السجلات بين مدير المدرسة ووكيل المدرسة ومصمم المنظومة</p>
@@ -933,7 +916,7 @@
                     </div>
                     <div class="bg-white p-3 rounded-xl border border-gray-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
                         <div>
-                            <div class="font-extrabold text-xs text-[#15445a]">أ) إرسال تطبيق المنظومة الجاهز للجوال (مدمج بالبيانات والربط السحابي)</div>
+                            <div class="font-extrabold text-xs text-[#15445a]">أ) إرسال تطبيق المنظومة الجاهز للجوال (مدمج بالبيانات وربط Supabase)</div>
                             <div class="text-[11px] text-gray-500">يفتح مباشرة على الآيفون والأندرويد بضغطة واحدة عبر واتساب أو تيليجرام</div>
                         </div>
                         <div class="flex items-center gap-2 shrink-0">
@@ -949,7 +932,7 @@
                     <div class="bg-white p-3 rounded-xl border border-gray-200 space-y-2">
                         <div class="flex items-center justify-between flex-wrap gap-1">
                             <span class="font-extrabold text-xs text-[#15445a]">ب) رابط المشاركة المباشر:</span>
-                            <span class="text-[10px] text-[#3078a6] font-bold">يدعم التمرير التلقائي للبيانات والسحابة</span>
+                            <span class="text-[10px] text-[#3078a6] font-bold">يدعم التمرير التلقائي للبيانات وسحابة Supabase</span>
                         </div>
                         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                             <input type="url" id="publicHostedUrlInput" placeholder="اختياري: ضع رابط استضافتك العام (مثلاً https://aiban-school.netlify.app)" class="flex-1 bg-gray-50 border border-gray-300 rounded-xl px-3 py-1.5 text-xs font-mono text-gray-700 focus:outline-none focus:border-[#07a869]">
@@ -966,74 +949,75 @@
                     </div>
                 </div>
 
-                <!-- 2. Real-time Cloud Sync -->
+                <!-- 2. Real-time Cloud Sync: Supabase Primary -->
                 <div class="p-4 rounded-2xl bg-[#3d7eb9]/10 border border-[#3d7eb9]/30 space-y-3">
                     <div class="flex items-center justify-between flex-wrap gap-2">
-                        <span class="font-extrabold text-[#15445a] text-sm">2. الربط السحابي الثنائي المباشر (Google Sheets عبر Google Apps Script)</span>
-                        <span id="cloudSyncStateLabel" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white text-[#3078a6] border border-[#3d7eb9]/30">حفظ محلي + سحابي فوري</span>
+                        <span class="font-extrabold text-[#15445a] text-sm">2. الربط السحابي المباشر والمزامنة الفورية مع قاعدة بيانات (Supabase)</span>
+                        <span id="cloudSyncStateLabel" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white text-[#07a869] border border-[#07a869]/40">جاهز للربط مع Supabase ⚡</span>
                     </div>
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                        <input type="url" id="cloudWebhookUrlInput" placeholder="https://script.google.com/macros/s/AKfycb.../exec" class="flex-1 bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs font-mono text-gray-700 focus:outline-none focus:border-[#3d7eb9]">
-                        <button type="button" id="btnSaveCloudUrl" class="px-3.5 py-2 rounded-xl moe-btn-primary text-white font-extrabold text-xs transition shrink-0">
-                            حفظ وإرسال للسحابة ⬆
+                    <p class="text-xs text-gray-600 leading-relaxed">
+                        أدخل رابط مشروع <strong>Supabase URL</strong> ومفتاح <strong>Anon / Public Key</strong> أدناه لتفعيل المزامنة السحابية اللحظية (Realtime) لجميع سجلات الدوام بين مدير المدرسة ووكيل المدرسة ومصمم المنظومة:
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[11px] font-extrabold text-[#15445a] mb-1">رابط مشروع Supabase (Project URL)</label>
+                            <input type="url" id="supabaseUrlInput" dir="ltr" placeholder="https://xxxxxxxxxxxx.supabase.co" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs font-mono text-gray-700 focus:outline-none focus:border-[#07a869]">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-extrabold text-[#15445a] mb-1">المفتاح العام (Anon Public Key)</label>
+                            <input type="text" id="supabaseKeyInput" dir="ltr" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-xs font-mono text-gray-700 focus:outline-none focus:border-[#07a869]">
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 pt-1">
+                        <button type="button" id="btnConnectSupabase" class="px-4 py-2 rounded-xl bg-[#07a869] hover:bg-[#15445a] text-white font-extrabold text-xs transition shadow-sm">
+                            ⚡ تفعيل الربط والمزامنة مع Supabase ⬆
                         </button>
-                        <button type="button" id="btnPullFromCloud" class="px-3.5 py-2 rounded-xl bg-[#0da9a6] hover:bg-[#07a869] text-white font-extrabold text-xs transition shrink-0">
-                            جلب البيانات من السحابة ⬇
+                        <button type="button" id="btnPullFromCloud" class="px-3.5 py-2 rounded-xl bg-[#0da9a6] hover:bg-[#07a869] text-white font-extrabold text-xs transition">
+                            جلب أحدث البيانات من السحابة ⬇
                         </button>
                     </div>
 
                     <div class="pt-2 border-t border-[#3d7eb9]/20">
                         <div class="flex items-center justify-between flex-wrap gap-2">
                             <button type="button" id="btnToggleGasGuide" class="text-xs font-extrabold text-[#15445a] hover:text-[#07a869] flex items-center gap-1.5 underline decoration-dotted underline-offset-4">
-                                <span>📋 عرض كود Google Apps Script الجاهز وخطوات الربط السريعة</span>
+                                <span>📋 عرض كود SQL الجاهز لإنشاء جدول Supabase في ثوانٍ (SQL Editor)</span>
                             </button>
                             <button type="button" id="btnCopyGasCode" class="px-3 py-1 rounded-lg bg-[#15445a] hover:bg-[#3078a6] text-white font-bold text-[11px] transition">
-                                نسخ كود Apps Script
+                                نسخ كود SQL لـ Supabase
                             </button>
                         </div>
 
-                        <div id="gasGuideContainer" class="mt-3 space-y-3 bg-white p-3.5 rounded-xl border border-gray-200 text-xs">
-                            <textarea id="gasCodeTextarea" readonly rows="7" dir="ltr" class="w-full bg-[#15445a] text-emerald-200 font-mono text-[11px] p-3 rounded-xl focus:outline-none leading-relaxed">function doGet(e) {
-  var props = PropertiesService.getScriptProperties();
-  var savedState = props.getProperty('MOE_AIBAN_ATTENDANCE_STATE');
-  if (!savedState) {
-    return ContentService.createTextOutput(JSON.stringify({ status: 'empty' }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-  return ContentService.createTextOutput(savedState)
-    .setMimeType(ContentService.MimeType.JSON);
-}
+                        <div id="gasGuideContainer" class="mt-3 space-y-2.5 bg-white p-3.5 rounded-xl border border-gray-200 text-xs">
+                            <ol class="list-decimal list-inside space-y-1 text-gray-700 leading-relaxed">
+                                <li>في لوحة تحكم <strong>Supabase</strong> الخاصة بمشروعك، افتح <strong>SQL Editor</strong> من القائمة الجانبية.</li>
+                                <li>انسخ كود SQL أدناه والصقه ثم اضغط <strong>Run</strong> لإنشاء جدول المنظومة وتفعيل المزامنة اللحظية.</li>
+                                <li>من قائمة <strong>Project Settings &larr; API</strong> انسخ <strong>Project URL</strong> ومفتاح <strong>anon public</strong>، ثم الصقهما في الحقلين أعلاه واضغط <strong>تفعيل الربط والمزامنة مع Supabase</strong>.</li>
+                            </ol>
+                            <textarea id="gasCodeTextarea" readonly rows="8" dir="ltr" class="w-full bg-[#15445a] text-emerald-200 font-mono text-[11px] p-3 rounded-xl focus:outline-none leading-relaxed">-- 1. إنشاء جدول منظومة الانضباط المدرسي (ابتدائية ومتوسطة عيبان)
+create table if not exists public.moe_aiban_sync (
+  id text primary key,
+  payload jsonb not null default '{}'::jsonb,
+  updated_by text,
+  updated_at timestamptz default now()
+);
 
-function doPost(e) {
-  try {
-    var raw = e.postData.contents;
-    var data = JSON.parse(raw);
-    PropertiesService.getScriptProperties().setProperty('MOE_AIBAN_ATTENDANCE_STATE', raw);
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    if (ss && data.currentDate && data.attendanceByDate && data.masterStaffRoster) {
-      var sheet = ss.getSheetByName(data.currentDate) || ss.insertSheet(data.currentDate);
-      sheet.clearContents();
-      sheet.appendRow(['م', 'الاسم الرباعي', 'العمل', 'السجل المدني', 'حضور الاصطفاف الصباحي', 'حالة الدوام اليومي', 'تصنيف الغياب/الاستئذان', 'وقت الحضور', 'وقت الانصراف', 'الملاحظات', 'آخر تحديث بواسطة']);
-      var dayMap = data.attendanceByDate[data.currentDate] || {};
-      for (var i = 0; i < data.masterStaffRoster.length; i++) {
-        var staff = data.masterStaffRoster[i];
-        var rec = dayMap[staff.id] || {};
-        sheet.appendRow([
-          i + 1, staff.name, staff.role, staff.civilId,
-          rec.assemblyAttended ? 'حاضر بالاصطفاف' : 'غير متواجد',
-          rec.status || 'حاضر منتظم', rec.absenceType || '—',
-          rec.arrivalTime || '-', rec.departureTime || '-',
-          rec.notes || '—', data.lastModifiedBy || ''
-        ]);
-      }
-    }
-    return ContentService.createTextOutput(JSON.stringify({ status: 'success', updatedAt: new Date().toISOString() }))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: err.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}</textarea>
+-- 2. السماح بالقراءة والكتابة للمنظومة وتفعيل التحديث اللحظي (Realtime)
+alter table public.moe_aiban_sync enable row level security;
+
+drop policy if exists "Allow public sync access" on public.moe_aiban_sync;
+create policy "Allow public sync access"
+  on public.moe_aiban_sync
+  for all
+  using (true)
+  with check (true);
+
+alter publication supabase_realtime add table public.moe_aiban_sync;</textarea>
+                            <div class="pt-2 border-t border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                <input type="url" id="cloudWebhookUrlInput" placeholder="اختياري: رابط إضافي لـ Google Apps Script (.../exec)" class="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1.5 text-[11px] font-mono text-gray-600 focus:outline-none">
+                                <button type="button" id="btnSaveCloudUrl" class="px-3 py-1.5 rounded-lg bg-gray-200 hover:bg-gray-300 text-[#15445a] font-bold text-[11px] transition shrink-0">
+                                    حفظ الرابط الإضافي
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1081,7 +1065,7 @@ function doPost(e) {
     </div>
 
     <script>
-        // --- Official MOE Visual Identity Logo Data URI (Clean Vector SVG in exact MOE colors) ---
+        // --- Official MOE Visual Identity Logo Data URI (Lightweight Vector SVG in exact MOE colors) ---
         const MOE_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 165">
             <defs>
                 <linearGradient id="moeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -1091,13 +1075,10 @@ function doPost(e) {
                 </linearGradient>
             </defs>
             <g fill="url(#moeGrad)">
-                <!-- Left Wing Dots -->
                 <circle cx="45" cy="24" r="9"/><circle cx="72" cy="28" r="8"/><circle cx="98" cy="34" r="7"/><circle cx="122" cy="42" r="6"/><circle cx="145" cy="52" r="5"/>
                 <circle cx="45" cy="48" r="8.5"/><circle cx="72" cy="51" r="7.5"/><circle cx="98" cy="56" r="6.5"/><circle cx="122" cy="62" r="5.5"/><circle cx="145" cy="70" r="4.5"/>
                 <circle cx="45" cy="72" r="8"/><circle cx="72" cy="74" r="7"/><circle cx="98" cy="77" r="6"/><circle cx="122" cy="82" r="5"/><circle cx="145" cy="88" r="4"/>
-                <!-- Center Spine Dots -->
                 <circle cx="170" cy="62" r="4.5"/><circle cx="170" cy="79" r="4.5"/><circle cx="170" cy="96" r="4.5"/>
-                <!-- Right Wing Dots -->
                 <circle cx="195" cy="52" r="5"/><circle cx="218" cy="42" r="6"/><circle cx="242" cy="34" r="7"/><circle cx="268" cy="28" r="8"/><circle cx="295" cy="24" r="9"/>
                 <circle cx="195" cy="70" r="4.5"/><circle cx="218" cy="62" r="5.5"/><circle cx="242" cy="56" r="6.5"/><circle cx="268" cy="51" r="7.5"/><circle cx="295" cy="48" r="8.5"/>
                 <circle cx="195" cy="88" r="4"/><circle cx="218" cy="82" r="5"/><circle cx="242" cy="77" r="6"/><circle cx="268" cy="74" r="7"/><circle cx="295" cy="72" r="8"/>
@@ -1139,6 +1120,188 @@ function doPost(e) {
         };
         let activeAuthorizedUser = AUTHORIZED_USERS.principal;
         let cloudWebhookUrl = '';
+        let supabaseUrl = '';
+        let supabaseAnonKey = '';
+
+        // --- Supabase Cloud Sync Manager (Realtime + REST Upsert/Select) ---
+        const SUPABASE_TABLE = 'moe_aiban_sync';
+        const SUPABASE_ROW_ID = 'aiban_main_state';
+        const MOE_SUPABASE = {
+            client: null,
+            channel: null,
+            isPushing: false,
+            activeUrl: '',
+            activeKey: '',
+
+            isConfigured() {
+                return Boolean(
+                    supabaseUrl &&
+                    supabaseAnonKey &&
+                    supabaseUrl.startsWith('https://') &&
+                    supabaseAnonKey.length > 20
+                );
+            },
+
+            updateBadge(text, isConnected = true) {
+                const badge = document.getElementById('cloudSyncStateLabel');
+                if (!badge) return;
+                badge.textContent = text;
+                badge.className = isConnected
+                    ? 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white text-[#07a869] border border-[#07a869]/40'
+                    : 'text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white text-amber-700 border border-amber-300';
+            },
+
+            async init(pullInitial = true) {
+                if (!this.isConfigured()) {
+                    this.updateBadge('جاهز للربط مع Supabase ⚡', false);
+                    return false;
+                }
+                if (!window.supabase || !window.supabase.createClient) {
+                    this.updateBadge('مكتبة Supabase غير محملة', false);
+                    return false;
+                }
+
+                try {
+                    const cleanUrl = supabaseUrl.trim().replace(/\/$/, '');
+                    const cleanKey = supabaseAnonKey.trim();
+
+                    if (!this.client || this.activeUrl !== cleanUrl || this.activeKey !== cleanKey) {
+                        if (this.channel && this.client) {
+                            try { this.client.removeChannel(this.channel); } catch (e) {}
+                        }
+                        this.client = window.supabase.createClient(cleanUrl, cleanKey);
+                        this.activeUrl = cleanUrl;
+                        this.activeKey = cleanKey;
+
+                        this.channel = this.client
+                            .channel('moe-aiban-realtime-channel')
+                            .on(
+                                'postgres_changes',
+                                {
+                                    event: '*',
+                                    schema: 'public',
+                                    table: SUPABASE_TABLE,
+                                    filter: `id=eq.${SUPABASE_ROW_ID}`
+                                },
+                                (change) => {
+                                    if (this.isPushing) return;
+                                    if (change.new && change.new.payload) {
+                                        applyRemoteStatePayload(change.new.payload);
+                                        updateLiveSaveIndicator('تحديث فوري من سحابة Supabase ⚡');
+                                    }
+                                }
+                            )
+                            .subscribe();
+                    }
+
+                    if (pullInitial) {
+                        const { data, error } = await this.client
+                            .from(SUPABASE_TABLE)
+                            .select('payload, updated_at, updated_by')
+                            .eq('id', SUPABASE_ROW_ID)
+                            .maybeSingle();
+
+                        if (error) {
+                            this.updateBadge('تحقق من تشغيل كود SQL في Supabase', false);
+                            return false;
+                        }
+
+                        if (data && data.payload && data.payload.attendanceByDate) {
+                            applyRemoteStatePayload(data.payload);
+                        } else {
+                            await this.push({
+                                currentSeason,
+                                currentDate,
+                                masterStaffRoster,
+                                attendanceByDate,
+                                customPins,
+                                lastModifiedBy: activeAuthorizedUser ? activeAuthorizedUser.name : 'النظام'
+                            });
+                        }
+                    }
+
+                    this.updateBadge('متصل بسحابة Supabase نشط ✓', true);
+                    updateLiveSaveIndicator('متصل بسحابة Supabase');
+                    return true;
+                } catch (err) {
+                    this.updateBadge('تعذر الاتصال بـ Supabase', false);
+                    return false;
+                }
+            },
+
+            async push(payload) {
+                if (!this.isConfigured()) return false;
+                if (!this.client) {
+                    await this.init(false);
+                }
+                if (!this.client) return false;
+
+                try {
+                    this.isPushing = true;
+                    const { error } = await this.client
+                        .from(SUPABASE_TABLE)
+                        .upsert(
+                            {
+                                id: SUPABASE_ROW_ID,
+                                payload: payload,
+                                updated_by: payload.lastModifiedBy || 'النظام',
+                                updated_at: new Date().toISOString()
+                            },
+                            { onConflict: 'id' }
+                        );
+
+                    if (error) {
+                        this.updateBadge('خطأ في حفظ Supabase (تأكد من جدول SQL)', false);
+                        return false;
+                    }
+                    this.updateBadge('متصل ومزامن مع Supabase ✓', true);
+                    return true;
+                } catch (err) {
+                    return false;
+                } finally {
+                    setTimeout(() => { this.isPushing = false; }, 350);
+                }
+            }
+        };
+
+        function applyRemoteStatePayload(remote) {
+            if (!remote || typeof remote !== 'object') return;
+            if (remote.currentSeason) currentSeason = remote.currentSeason;
+            if (Array.isArray(remote.masterStaffRoster) && remote.masterStaffRoster.length > 0) {
+                masterStaffRoster = remote.masterStaffRoster;
+            }
+            if (remote.attendanceByDate && typeof remote.attendanceByDate === 'object') {
+                attendanceByDate = remote.attendanceByDate;
+            }
+            if (remote.customPins && typeof remote.customPins === 'object') {
+                customPins = remote.customPins;
+            }
+            ensureDateRecordExists(currentDate);
+            try {
+                localStorage.setItem('moe_aiban_hr_attendance_v2', JSON.stringify({
+                    currentSeason,
+                    currentDate,
+                    masterStaffRoster,
+                    attendanceByDate,
+                    customPins,
+                    cloudWebhookUrl,
+                    supabaseUrl,
+                    supabaseAnonKey
+                }));
+            } catch (e) {}
+            renderHeaderAndSeasonUI();
+            renderKPIs();
+            renderTable();
+            if (!document.getElementById('viewReports').classList.contains('hidden')) {
+                renderReportsView();
+            }
+            if (!document.getElementById('viewHistory').classList.contains('hidden')) {
+                renderArchiveView();
+            }
+            if (!document.getElementById('viewAnalytics').classList.contains('hidden')) {
+                renderAnalytics();
+            }
+        }
 
         // --- Season Timing Configurations ---
         const SEASON_CONFIG = {
@@ -1300,11 +1463,13 @@ function doPost(e) {
 
         function loadState() {
             let urlCloudParam = '';
+            let urlSbUrlParam = '';
+            let urlSbKeyParam = '';
             try {
                 const params = new URLSearchParams(window.location.search);
-                if (params.get('cloud')) {
-                    urlCloudParam = params.get('cloud').trim();
-                }
+                if (params.get('cloud')) urlCloudParam = params.get('cloud').trim();
+                if (params.get('sbUrl')) urlSbUrlParam = params.get('sbUrl').trim();
+                if (params.get('sbKey')) urlSbKeyParam = params.get('sbKey').trim();
             } catch (err) {}
 
             try {
@@ -1314,7 +1479,11 @@ function doPost(e) {
                     const sharedPayload = JSON.parse(decodedJson);
                     if (sharedPayload) {
                         if (sharedPayload.cloudWebhookUrl) cloudWebhookUrl = sharedPayload.cloudWebhookUrl;
+                        if (sharedPayload.supabaseUrl) supabaseUrl = sharedPayload.supabaseUrl;
+                        if (sharedPayload.supabaseAnonKey) supabaseAnonKey = sharedPayload.supabaseAnonKey;
                         if (urlCloudParam) cloudWebhookUrl = urlCloudParam;
+                        if (urlSbUrlParam) supabaseUrl = urlSbUrlParam;
+                        if (urlSbKeyParam) supabaseAnonKey = urlSbKeyParam;
                         if (sharedPayload.customPins) customPins = sharedPayload.customPins;
                         if (sharedPayload.attendanceByDate) {
                             currentSeason = sharedPayload.currentSeason || 'winter';
@@ -1341,12 +1510,18 @@ function doPost(e) {
                     ensureDateRecordExists(TODAY_DEFAULT_DATE);
                     if (parsed.customPins) customPins = parsed.customPins;
                     if (parsed.cloudWebhookUrl) cloudWebhookUrl = parsed.cloudWebhookUrl;
+                    if (parsed.supabaseUrl) supabaseUrl = parsed.supabaseUrl;
+                    if (parsed.supabaseAnonKey) supabaseAnonKey = parsed.supabaseAnonKey;
                     if (urlCloudParam) cloudWebhookUrl = urlCloudParam;
+                    if (urlSbUrlParam) supabaseUrl = urlSbUrlParam;
+                    if (urlSbKeyParam) supabaseAnonKey = urlSbKeyParam;
                     return;
                 }
             } catch (e) {}
 
             if (urlCloudParam) cloudWebhookUrl = urlCloudParam;
+            if (urlSbUrlParam) supabaseUrl = urlSbUrlParam;
+            if (urlSbKeyParam) supabaseAnonKey = urlSbKeyParam;
             masterStaffRoster = JSON.parse(JSON.stringify(OFFICIAL_ROSTER));
             attendanceByDate = {
                 '2026-11-17': createDefaultDayMap('winter', 'today'),
@@ -1371,6 +1546,8 @@ function doPost(e) {
                 attendanceByDate,
                 customPins,
                 cloudWebhookUrl,
+                supabaseUrl,
+                supabaseAnonKey,
                 lastModifiedBy: activeAuthorizedUser ? activeAuthorizedUser.name : 'النظام',
                 lastUpdatedAt: new Date().toISOString()
             };
@@ -1380,6 +1557,16 @@ function doPost(e) {
                 updateLiveSaveIndicator('تم الحفظ المباشر');
             } catch (e) {}
 
+            // 1. Primary Cloud Sync: Supabase
+            if (triggerCloud && MOE_SUPABASE.isConfigured()) {
+                updateLiveSaveIndicator('جاري المزامنة مع Supabase...');
+                const ok = await MOE_SUPABASE.push(payload);
+                if (ok) {
+                    updateLiveSaveIndicator('تم الحفظ والمزامنة في Supabase ⚡');
+                }
+            }
+
+            // 2. Optional Secondary Cloud Sync: Google Apps Script
             if (triggerCloud && cloudWebhookUrl && cloudWebhookUrl.startsWith('https://')) {
                 try {
                     updateLiveSaveIndicator('جاري المزامنة السحابية...');
@@ -1390,15 +1577,26 @@ function doPost(e) {
                     });
                     updateLiveSaveIndicator('تم الحفظ والمزامنة السحابية');
                 } catch (err) {
-                    updateLiveSaveIndicator('محفوظ محلياً (تعذر الاتصال بالسحابة)');
+                    updateLiveSaveIndicator('محفوظ محلياً');
                 }
             }
         }
 
         async function fetchFromCloud(showToast = false) {
-            if (!cloudWebhookUrl || !cloudWebhookUrl.startsWith('https://')) {
+            if (MOE_SUPABASE.isConfigured()) {
+                updateLiveSaveIndicator('جاري جلب البيانات من Supabase...');
+                const ok = await MOE_SUPABASE.init(true);
                 if (showToast) {
-                    document.getElementById('shareModalToast').textContent = 'يرجى إدخال رابط Google Apps Script صالح يبدأ بـ https://';
+                    document.getElementById('shareModalToast').textContent = ok
+                        ? 'تم جلب ومزامنة أحدث السجلات من سحابة Supabase بنجاح ✓'
+                        : 'تعذر الجلب من Supabase — تأكد من تشغيل كود SQL وصحة الرابط والمفتاح';
+                }
+                if (ok) return;
+            }
+
+            if (!cloudWebhookUrl || !cloudWebhookUrl.startsWith('https://')) {
+                if (showToast && !MOE_SUPABASE.isConfigured()) {
+                    document.getElementById('shareModalToast').textContent = 'يرجى إدخال بيانات مشروع Supabase (Project URL & Anon Key) أولاً';
                 }
                 return;
             }
@@ -1407,18 +1605,10 @@ function doPost(e) {
                 const res = await fetch(cloudWebhookUrl, { method: 'GET' });
                 const data = await res.json();
                 if (data && data.attendanceByDate && data.masterStaffRoster) {
-                    currentSeason = data.currentSeason || currentSeason;
-                    currentDate = data.currentDate || currentDate;
-                    masterStaffRoster = data.masterStaffRoster;
-                    attendanceByDate = data.attendanceByDate;
-                    if (data.customPins) customPins = data.customPins;
-                    await saveState(false);
-                    renderHeaderAndSeasonUI();
-                    renderKPIs();
-                    renderTable();
+                    applyRemoteStatePayload(data);
                     updateLiveSaveIndicator('تمت المزامنة من السحابة بنجاح');
                     if (showToast) {
-                        document.getElementById('shareModalToast').textContent = 'تم جلب أحدث السجلات من Google Sheets بنجاح ✓';
+                        document.getElementById('shareModalToast').textContent = 'تم جلب أحدث السجلات من السحابة بنجاح ✓';
                     }
                 } else if (showToast) {
                     document.getElementById('shareModalToast').textContent = 'السحابة متصلة وجاهزة';
@@ -1426,7 +1616,7 @@ function doPost(e) {
             } catch (err) {
                 updateLiveSaveIndicator('يعمل بالبيانات المحلية');
                 if (showToast) {
-                    document.getElementById('shareModalToast').textContent = 'تعذر جلب البيانات من الرابط — تأكد من نشر السكربت بصلاحية (Anyone)';
+                    document.getElementById('shareModalToast').textContent = 'تعذر جلب البيانات من الرابط';
                 }
             }
         }
@@ -1437,6 +1627,9 @@ function doPost(e) {
                     ? publicHostedBaseUrl.trim()
                     : window.location.href;
                 const baseUrl = rawBase.split('#')[0].split('?')[0];
+                if (MOE_SUPABASE.isConfigured()) {
+                    return `${baseUrl}?sbUrl=${encodeURIComponent(supabaseUrl.trim())}&sbKey=${encodeURIComponent(supabaseAnonKey.trim())}`;
+                }
                 if (cloudWebhookUrl && cloudWebhookUrl.startsWith('https://')) {
                     return `${baseUrl}?cloud=${encodeURIComponent(cloudWebhookUrl)}`;
                 }
@@ -1445,7 +1638,9 @@ function doPost(e) {
                     currentDate,
                     masterStaffRoster,
                     attendanceByDate,
-                    cloudWebhookUrl
+                    cloudWebhookUrl,
+                    supabaseUrl,
+                    supabaseAnonKey
                 };
                 const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(compactPayload))));
                 return `${baseUrl}#share=${base64}`;
@@ -1461,7 +1656,9 @@ function doPost(e) {
                 masterStaffRoster,
                 attendanceByDate,
                 customPins,
-                cloudWebhookUrl
+                cloudWebhookUrl,
+                supabaseUrl,
+                supabaseAnonKey
             });
             const cloneDoc = document.documentElement.cloneNode(true);
             const gate = cloneDoc.querySelector('#authGateOverlay');
@@ -1479,6 +1676,8 @@ function doPost(e) {
                         } else {
                             var existing = JSON.parse(localStorage.getItem('moe_aiban_hr_attendance_v2'));
                             if (preloaded.cloudWebhookUrl) existing.cloudWebhookUrl = preloaded.cloudWebhookUrl;
+                            if (preloaded.supabaseUrl) existing.supabaseUrl = preloaded.supabaseUrl;
+                            if (preloaded.supabaseAnonKey) existing.supabaseAnonKey = preloaded.supabaseAnonKey;
                             existing.attendanceByDate = Object.assign({}, preloaded.attendanceByDate, existing.attendanceByDate || {});
                             localStorage.setItem('moe_aiban_hr_attendance_v2', JSON.stringify(existing));
                         }
@@ -2751,7 +2950,6 @@ function doPost(e) {
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Set logos across all headers
             ['gateLogoImg', 'headerLogoImg', 'printBannerLogoImg', 'compReportLogoImg'].forEach(id => {
                 const imgEl = document.getElementById(id);
                 if (imgEl) imgEl.src = MOE_LOGO_URI;
@@ -2824,6 +3022,8 @@ function doPost(e) {
 
             document.getElementById('btnOpenShareCloudModal').addEventListener('click', () => {
                 if (!activeAuthorizedUser || activeAuthorizedUser.roleKey !== 'designer') return;
+                document.getElementById('supabaseUrlInput').value = supabaseUrl || '';
+                document.getElementById('supabaseKeyInput').value = supabaseAnonKey || '';
                 document.getElementById('shareableLinkInput').value = generateShareableLink();
                 document.getElementById('cloudWebhookUrlInput').value = cloudWebhookUrl || '';
                 document.getElementById('pinPrincipalInput').value = customPins.principal || '1008535922';
@@ -2884,13 +3084,31 @@ function doPost(e) {
                 document.getElementById('btnDownloadMobileAppHTML').click();
             });
 
+            document.getElementById('btnConnectSupabase').addEventListener('click', async () => {
+                supabaseUrl = document.getElementById('supabaseUrlInput').value.trim();
+                supabaseAnonKey = document.getElementById('supabaseKeyInput').value.trim();
+                if (!MOE_SUPABASE.isConfigured()) {
+                    document.getElementById('shareModalToast').textContent = 'يرجى إدخال رابط Supabase URL ومفتاح Anon Key بشكل صحيح';
+                    return;
+                }
+                document.getElementById('shareModalToast').textContent = 'جاري الاتصال بسحابة Supabase...';
+                await saveState(true);
+                const connected = await MOE_SUPABASE.init(true);
+                document.getElementById('shareableLinkInput').value = generateShareableLink();
+                document.getElementById('shareModalToast').textContent = connected
+                    ? 'تم الربط والمزامنة الفورية مع سحابة Supabase بنجاح ✓'
+                    : 'تم حفظ المفاتيح — يرجى التأكد من تشغيل كود SQL في Supabase SQL Editor';
+            });
+
             document.getElementById('btnSaveCloudUrl').addEventListener('click', () => {
                 cloudWebhookUrl = document.getElementById('cloudWebhookUrlInput').value.trim();
                 saveState(true);
-                document.getElementById('shareModalToast').textContent = 'تم حفظ رابط Google Apps Script وإرسال السجلات للسحابة بنجاح ✓';
+                document.getElementById('shareModalToast').textContent = 'تم حفظ الرابط الإضافي وإرسال السجلات للسحابة بنجاح ✓';
             });
 
             document.getElementById('btnPullFromCloud').addEventListener('click', () => {
+                supabaseUrl = document.getElementById('supabaseUrlInput').value.trim();
+                supabaseAnonKey = document.getElementById('supabaseKeyInput').value.trim();
                 cloudWebhookUrl = document.getElementById('cloudWebhookUrlInput').value.trim();
                 fetchFromCloud(true);
             });
@@ -2904,10 +3122,12 @@ function doPost(e) {
                 document.getElementById('gasGuideContainer').classList.remove('hidden');
                 codeArea.select();
                 document.execCommand('copy');
-                document.getElementById('shareModalToast').textContent = 'تم نسخ كود Google Apps Script للحافظة بنجاح ✓';
+                document.getElementById('shareModalToast').textContent = 'تم نسخ كود SQL الخاص بـ Supabase للحافظة بنجاح ✓';
             });
 
-            if (cloudWebhookUrl && cloudWebhookUrl.startsWith('https://')) {
+            if (MOE_SUPABASE.isConfigured()) {
+                MOE_SUPABASE.init(true);
+            } else if (cloudWebhookUrl && cloudWebhookUrl.startsWith('https://')) {
                 fetchFromCloud(false);
             }
 
